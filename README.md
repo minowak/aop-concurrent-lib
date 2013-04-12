@@ -16,15 +16,25 @@ Wizja
 -------------------------
 
 Projekt będzie oparty na adnotacjach/dekoratorach typu:
+
 `@Synchronized`
+
 `@Synchronized("ID_1")`
+
 `@Writer`
+
 `@Writer("ID_1")`
+
 `@Reader`
+
 `@Reader("ID_1")`
+
 `@Producer`
+
 `@Producer("ID_1")`
+
 `@Consumer`
+
 `@Consumer("ID_1")`
 
 Odpowiednie aspekty będą opakowywać metody z powyższymi adnotacjiami i dodawać obsługę
