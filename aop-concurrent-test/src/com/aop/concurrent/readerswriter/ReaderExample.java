@@ -1,7 +1,6 @@
 package com.aop.concurrent.readerswriter;
 
 import com.aop.concurrent.annotations.Reader;
-import com.aop.concurrent.annotations.Synchronized;
 import com.aop.concurrent.test.synchronize.Buffer;
 
 public class ReaderExample extends Thread {
