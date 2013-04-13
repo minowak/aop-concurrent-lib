@@ -54,39 +54,9 @@ public aspect ReadersWritersAspect {
 	 * @return method call result
 	 */
 	Object around(Reader reader) : readerPoint(reader) {
-		Long currentReadersCount = null;
-		Object currentWritingLock = null;
-		Object currentLock = null;
-
-		if(reader.library().isEmpty()) {
-			currentReadersCount = masterReadersCount;
-			currentWritingLock = masterWritingLock;
-			currentLock = masterLock;
-		} else {
-			// Readers count
-			if(readersCount.get(reader.library()) == null) {
-				currentReadersCount = new Long(0);
-				readersCount.put(reader.library(), currentReadersCount);
-			} else {
-				currentReadersCount = readersCount.get(reader.library());
-			}
-
-			// Writer lock
-			if(writingLocks.get(reader.library()) == null) {
-				currentWritingLock = new Object();
-				writingLocks.put(reader.library(), currentWritingLock);
-			} else {
-				currentWritingLock = writingLocks.get(reader.library());
-			}
-
-			// Locks
-			if(locks.get(reader.library()) == null) {
-				currentLock = new Object();
-				locks.put(reader.library(), currentLock);
-			} else {
-				currentLock = locks.get(reader.library());
-			}
-		}
+		Long currentReadersCount = getCurrentReadersCount(reader.library());
+		Object currentWritingLock = getCurrentWritingLock(reader.library());
+		Object currentLock = getCurrentLock(reader.library());
 
 		// Start reading
 		Object ret = null;
@@ -127,38 +97,7 @@ public aspect ReadersWritersAspect {
 	 * @return method call result
 	 */
 	Object around(Writer writer) : writerPoint(writer) {
-		Long currentReadersCount = null;
-		Object currentWritingLock = null;
-		Object currentLock = null;
-
-		if(writer.library().isEmpty()) {
-			currentReadersCount = masterReadersCount;
-			currentWritingLock = masterWritingLock;
-		} else {
-			// Readers count
-			if(readersCount.get(writer.library()) == null) {
-				currentReadersCount = new Long(0);
-				readersCount.put(writer.library(), currentReadersCount);
-			} else {
-				currentReadersCount = readersCount.get(writer.library());
-			}
-
-			// Writer lock
-			if(writingLocks.get(writer.library()) == null) {
-				currentWritingLock = new Object();
-				writingLocks.put(writer.library(), currentWritingLock);
-			} else {
-				currentWritingLock = writingLocks.get(writer.library());
-			}
-
-			// Locks
-			if(locks.get(writer.library()) == null) {
-				currentLock = new Object();
-				locks.put(writer.library(), currentLock);
-			} else {
-				currentLock = locks.get(writer.library());
-			}
-		}
+		Object currentWritingLock = getCurrentWritingLock(writer.library());
 
 		// Write
 		Object ret = null;
@@ -175,5 +114,70 @@ public aspect ReadersWritersAspect {
 		}
 
 		return ret;
+	}
+
+	/**
+	 * Return current readers count.
+	 *
+	 * @param library
+	 * 			library name
+	 * @return current readers count
+	 */
+	private Long getCurrentReadersCount(String library) {
+		Long currentReadersCount = null;
+		if(library.isEmpty()) {
+			currentReadersCount = masterReadersCount;
+		} else
+		if(readersCount.get(library) == null) {
+			currentReadersCount = new Long(0);
+			readersCount.put(library, currentReadersCount);
+		} else {
+			currentReadersCount = readersCount.get(library);
+		}
+
+		return currentReadersCount;
+	}
+
+	/**
+	 * Returns current writing lock.
+	 *
+	 * @param library
+	 * 			library name
+	 * @return current writing lock
+	 */
+	private Object getCurrentWritingLock(String library) {
+		Object currentWritingLock = null;
+		if(library.isEmpty()) {
+			currentWritingLock = masterWritingLock;
+		} else
+		if(writingLocks.get(library) == null) {
+			currentWritingLock = new Object();
+			writingLocks.put(library, currentWritingLock);
+		} else {
+			currentWritingLock = writingLocks.get(library);
+		}
+		return currentWritingLock;
+	}
+
+	/**
+	 * Returns current lock.
+	 *
+	 * @param library
+	 * 			library name
+	 * @return current lock
+	 */
+	private Object getCurrentLock(String library) {
+		Object currentLock = null;
+		if(library.isEmpty()) {
+			currentLock = masterLock;
+		} else
+		if(locks.get(library) == null) {
+			currentLock = new Object();
+			locks.put(library, currentLock);
+		} else {
+			currentLock = locks.get(library);
+		}
+
+		return currentLock;
 	}
 }
