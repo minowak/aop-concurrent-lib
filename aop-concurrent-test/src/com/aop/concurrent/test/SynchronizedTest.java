@@ -1,10 +1,13 @@
 package com.aop.concurrent.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.aop.concurrent.readerswriter.ReaderExample;
+import com.aop.concurrent.readerswriter.WriterExample;
 import com.aop.concurrent.test.synchronize.Buffer;
 import com.aop.concurrent.test.synchronize.ExampleSynchronized;
 import com.aop.concurrent.test.synchronize.ExampleSynchronizedBetween1;
@@ -74,6 +77,39 @@ public class SynchronizedTest {
 
 		// then
 		assertEquals(Buffer.get(), String.format("%s%s", EXAMPLE_TEXT1, EXAMPLE_TEXT2));
+	}
+
+	/**
+	 * Tests readers writers problem.
+	 *
+	 * @throws InterruptedException
+	 */
+	@Test
+	public void testReadersWriters() throws InterruptedException {
+		// given
+		long readersCount = 5;
+		WriterExample[] we = new WriterExample[5];
+		ReaderExample[] re = new ReaderExample[5];
+		for(int i = 0 ; i < readersCount ; i++) {
+			re[i] = new ReaderExample(TIME2);
+			we[i] = new WriterExample(TIME1);
+		}
+
+		// when
+		for(int i = 0 ; i < readersCount ; i++) {
+			we[i].start();
+			re[i].start();
+		}
+
+		boolean result = true;
+		for(int i = 0 ; i < readersCount ; i++) {
+			we[i].join();
+			re[i].join();
+			result = result && re[i].getResult();
+		}
+
+		// then
+		assertTrue(result);
 	}
 
 }
