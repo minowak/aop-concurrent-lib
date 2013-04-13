@@ -16,6 +16,9 @@ public aspect SynchronizedAspect {
 
 	/**
 	 * Pointcut: methods with @Synchronized annotation.
+	 *
+	 * @param sync
+	 * 			Synchronized annotation
 	 */
 	pointcut syncPoint(Synchronized sync) : execution(@Synchronized * *.*(..)) && @annotation(sync);
 
