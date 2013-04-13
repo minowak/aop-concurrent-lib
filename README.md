@@ -23,11 +23,11 @@ Projekt będzie oparty na adnotacjach/dekoratorach typu:
 
 `@Writer`
 
-`@Writer(id = "ID_1")`
+`@Writer(library = "ID_1")`
 
 `@Reader`
 
-`@Reader(id = "ID_1")`
+`@Reader(library = "ID_1")`
 
 `@Producer`
 

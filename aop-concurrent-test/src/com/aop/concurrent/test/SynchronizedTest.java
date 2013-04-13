@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.aop.concurrent.readerswriter.ReaderExample;
+import com.aop.concurrent.readerswriter.ReaderExample2;
 import com.aop.concurrent.readerswriter.WriterExample;
 import com.aop.concurrent.test.synchronize.Buffer;
 import com.aop.concurrent.test.synchronize.ExampleSynchronized;
@@ -81,6 +82,7 @@ public class SynchronizedTest {
 
 	/**
 	 * Tests readers writers problem.
+	 * Writer should start first (asserts depends on this).
 	 *
 	 * @throws InterruptedException
 	 */
@@ -110,6 +112,32 @@ public class SynchronizedTest {
 
 		// then
 		assertTrue(result);
+	}
+
+	/**
+	 * Tests readers writers problem with different readers classes.
+	 * Writer should start first (asserts depends on this).
+	 *
+	 * @throws InterruptedException
+	 */
+	@Test
+	public void testReadersWritersDifferentReaders() throws InterruptedException {
+		// given
+		WriterExample we = new WriterExample(TIME1);
+		ReaderExample re1 = new ReaderExample(TIME1);
+		ReaderExample2 re2 = new ReaderExample2(TIME2);
+
+		// when
+		we.start();
+		re1.start();
+		re2.start();
+
+		we.join();
+		re1.join();
+		re2.join();
+
+		// then
+		assertTrue(re1.getResult() && re2.getResult());
 	}
 
 }
