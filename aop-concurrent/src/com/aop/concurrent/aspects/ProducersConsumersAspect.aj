@@ -22,7 +22,7 @@ public aspect ProducersConsumersAspect {
 //		System.out.println("before(): producePointcut()");
 //		System.out.println("ProdConsBuffer.count: " + ProdConsBuffer.count);
 		synchronized (this) {
-			while ( ProdConsBuffer.count >= 5 ) {
+			while ( ProdConsBuffer.count >= ProdConsBuffer.SIZE ) {
 				producers++;
 				try {
 					wait();
