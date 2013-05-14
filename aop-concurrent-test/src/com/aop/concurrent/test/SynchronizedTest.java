@@ -15,6 +15,7 @@ import com.aop.concurrent.test.synchronize.Buffer;
 import com.aop.concurrent.test.synchronize.ExampleSynchronized;
 import com.aop.concurrent.test.synchronize.ExampleSynchronizedBetween1;
 import com.aop.concurrent.test.synchronize.ExampleSynchronizedBetween2;
+import com.aop.concurrent.utils.ProdConsBuffer;
 
 /**
  * Tests for @Synchronized. We test only success cases as we can't provide
@@ -150,11 +151,12 @@ public class SynchronizedTest {
 	 */
 	@Test
 	public void testProducerConsumer() throws InterruptedException {
+		ProdConsBuffer buff = new ProdConsBuffer();
 		// given
-		ProducerExample p1 = new ProducerExample(TIME1,10);
-		ProducerExample p2 = new ProducerExample(TIME1,10);
-		ConsumerExample c1 = new ConsumerExample(TIME1,10);
-		ConsumerExample c2 = new ConsumerExample(TIME1,10);
+		ProducerExample p1 = new ProducerExample(TIME1,100,buff);
+		ProducerExample p2 = new ProducerExample(TIME1,100,buff);
+		ConsumerExample c1 = new ConsumerExample(TIME1,100,buff);
+		ConsumerExample c2 = new ConsumerExample(TIME1,100,buff);
 
 		// when
 		p1.start();
