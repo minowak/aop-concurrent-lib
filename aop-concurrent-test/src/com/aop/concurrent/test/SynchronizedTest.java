@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.aop.concurrent.producersconsumers.ConsumerExample;
+import com.aop.concurrent.producersconsumers.ProducerExample;
 import com.aop.concurrent.readerswriter.ReaderExample;
 import com.aop.concurrent.readerswriter.ReaderExample2;
 import com.aop.concurrent.readerswriter.WriterExample;
@@ -126,18 +128,48 @@ public class SynchronizedTest {
 		WriterExample we = new WriterExample(TIME1);
 		ReaderExample re1 = new ReaderExample(TIME1);
 		ReaderExample2 re2 = new ReaderExample2(TIME2);
-
+		
 		// when
 		we.start();
 		re1.start();
 		re2.start();
-
+		
 		we.join();
 		re1.join();
 		re2.join();
-
+		
 		// then
 		assertTrue(re1.getResult() && re2.getResult());
+	}
+	
+	/**
+	 * Tests readers writers problem with different readers classes.
+	 * Writer should start first (asserts depends on this).
+	 *
+	 * @throws InterruptedException
+	 */
+	@Test
+	public void testProducerConsumer() throws InterruptedException {
+		// given
+		ProducerExample p1 = new ProducerExample(TIME1,10);
+		ProducerExample p2 = new ProducerExample(TIME1,10);
+		ConsumerExample c1 = new ConsumerExample(TIME1,10);
+		ConsumerExample c2 = new ConsumerExample(TIME1,10);
+
+		// when
+		p1.start();
+		p2.start();
+		c1.start();
+		c2.start();
+		
+		p1.join();
+		p2.join();
+		c1.join();
+		c2.join();
+
+
+		// then
+//		assertTrue(re1.getResult() && re2.getResult());
 	}
 
 }
