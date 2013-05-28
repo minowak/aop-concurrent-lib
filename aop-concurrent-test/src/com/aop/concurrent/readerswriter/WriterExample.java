@@ -14,6 +14,10 @@ public class WriterExample extends Thread {
 
 	@Writer(library = "lib1")
 	public void run() {
+		writeToBuffer();
+	}
+
+	private void writeToBuffer() {
 		try {
 			Buffer.clean();
 			for(int i = 0 ; i < TEXT.length() ; i++) {

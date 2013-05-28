@@ -19,6 +19,10 @@ public class ReaderExample extends Thread {
 
 	@Reader(library = "lib1")
 	public void run() {
+		readFromBuffer();
+	}
+
+	private void readFromBuffer() {
 		long l = COUNT;
 		while(l-- > 0) {
 			result = Buffer.get();
