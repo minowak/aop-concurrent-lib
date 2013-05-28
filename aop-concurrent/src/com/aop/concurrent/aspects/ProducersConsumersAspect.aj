@@ -1,7 +1,10 @@
 package com.aop.concurrent.aspects;
 
-import com.aop.concurrent.utils.ProdConsBuffer;
+import java.util.concurrent.Semaphore;
 
+import com.aop.concurrent.annotations.Consumer;
+import com.aop.concurrent.annotations.Producer;
+//import com.aop.concurrent.utils.BufferHelper;
 
 /**
  * Aspect for producers-consumers problem
@@ -11,63 +14,89 @@ import com.aop.concurrent.utils.ProdConsBuffer;
  */
 public aspect ProducersConsumersAspect {
 
-	private int consumers = 0; // number of blocked consumers
-	private int producers = 0; // number of blocked producers
+	private int itemsCount = 0;
+	private Object full = new Object();
+	private Object empty = new Object();
 	
-	pointcut producePointcut(): call(void ProdConsBuffer.produce(int));
-	pointcut consumerPointcut(): call(int ProdConsBuffer.consume() );
+	private Semaphore fillSemaphore ;
+	private Semaphore emptySemaphore ;
+	private Semaphore mutexJ = new Semaphore(1);
+	private Semaphore mutexK = new Semaphore(1);
+	private Semaphore mutex = new Semaphore(1);
 	
-	
-	before(): producePointcut() {
-//		System.out.println("before(): producePointcut()");
-//		System.out.println("ProdConsBuffer.count: " + ProdConsBuffer.count);
-		synchronized (this) {
-			while ( ProdConsBuffer.count >= ProdConsBuffer.SIZE ) {
-				producers++;
-				try {
-					wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+	/**
+	 * Producer pointcut
+	 * @param producer
+	 */
+	pointcut producerPoint(Producer producer) : execution(@Producer * *.*(..)) && @annotation(producer);	
+
+	/**
+	 * Consumer pointcut
+	 * @param producer
+	 */
+	pointcut consumerPoint(Consumer consumer) : execution(@Consumer * *.*(..)) && @annotation(consumer);	
+
+
+
+	Object around(Producer producer) : producerPoint(producer) {
+//		System.out.println("producer aspect");
+		Object ret = null;
+		try {
+			mutex.acquire();
+			if (fillSemaphore == null) {
+				fillSemaphore = new Semaphore(0);
 			}
-		}
-	}
-	
-	after() returning: producePointcut() {
-//		System.out.println("after() returning: producePointcut()");
-//		System.out.println("ProdConsBuffer.count: " + ProdConsBuffer.count);
-		synchronized (this) {
-			if (consumers > 0) {
-				consumers--;
-				notify();
+			if (emptySemaphore == null) {
+				emptySemaphore = new Semaphore(producer.size());
 			}
+			mutex.release();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
+		
+		try {
+			emptySemaphore.acquire();
+				mutexJ.acquire();
+					ret = proceed(producer);
+				mutexJ.release();
+			fillSemaphore.release();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		
+		return ret;
 	}
-	
-	before(): consumerPointcut() {
-//		System.out.println("before(): consumerPointcut()");
-//		System.out.println("ProdConsBuffer.count: " + ProdConsBuffer.count);
-		synchronized (this) {
-			while ( ProdConsBuffer.count <= 0 ) {
-				consumers++;
-				try {
-					wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+
+	Object around(Consumer consumer) : consumerPoint(consumer) {
+//		System.out.println("consumer aspect");
+		Object ret = null;
+		try {
+			mutex.acquire();
+			if (fillSemaphore == null) {
+				fillSemaphore = new Semaphore(0);
 			}
-		}
-	}
-	
-	after() returning: consumerPointcut() {
-//		System.out.println("after() returning: consumerPointcut()");
-//		System.out.println("ProdConsBuffer.count: " + ProdConsBuffer.count);
-		synchronized (this) {
-			if (producers > 0) {
-				producers--;
-				notify();
+			if (emptySemaphore == null) {
+				emptySemaphore = new Semaphore(consumer.size());
 			}
+			mutex.release();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
+		try {
+			fillSemaphore.acquire();
+				mutexK.acquire();
+					ret = proceed(consumer);
+				mutexK.release();
+			emptySemaphore.release();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return ret;
 	}
-	
+
+
+//	private Object getLock(String name) {
+//		
+//	}
 }

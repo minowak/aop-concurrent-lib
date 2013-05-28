@@ -153,10 +153,10 @@ public class SynchronizedTest {
 	public void testProducerConsumer() throws InterruptedException {
 		ProdConsBuffer buff = new ProdConsBuffer();
 		// given
-		ProducerExample p1 = new ProducerExample(TIME1,100,buff);
-		ProducerExample p2 = new ProducerExample(TIME1,100,buff);
-		ConsumerExample c1 = new ConsumerExample(TIME1,100,buff);
-		ConsumerExample c2 = new ConsumerExample(TIME1,100,buff);
+		ProducerExample p1 = new ProducerExample(TIME1,50,buff);
+		ProducerExample p2 = new ProducerExample(TIME1,50,buff);
+		ConsumerExample c1 = new ConsumerExample(TIME1,50,buff);
+		ConsumerExample c2 = new ConsumerExample(TIME1,50,buff);
 
 		// when
 		p1.start();

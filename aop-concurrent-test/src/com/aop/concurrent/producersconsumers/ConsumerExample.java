@@ -18,7 +18,7 @@ public class ConsumerExample extends Thread {
 		try {
 			for (int i=0; i<loops; i++) {
 				int item = buff.consume();
-//				System.out.println("Consumer: consumeds " + item);
+//				System.out.println("Consumer: " + item);
 				Thread.sleep(sleepTime);
 			}
 		} catch(InterruptedException e) {
