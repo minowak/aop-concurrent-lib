@@ -17,7 +17,7 @@ public class ReaderExample2 extends Thread {
 		result = new String();
 	}
 
-	@Reader(library = "lib1")
+//	@Reader(library = "lib1")
 	public void run() {
 		readFromBuffer();
 	}
@@ -25,7 +25,7 @@ public class ReaderExample2 extends Thread {
 	private void readFromBuffer() {
 		long l = COUNT;
 		while(l-- > 0) {
-			result = Buffer.get();
+			result = read();
 			System.out.println("read2: " + result);
 			if(!result.equals("qwertyuiop")) {
 				success = false;
@@ -37,7 +37,11 @@ public class ReaderExample2 extends Thread {
 			}
 		}
 	}
-
+	
+	@Reader(library = "lib1")
+	public String read() {
+		return Buffer.get();
+	}
 	public boolean getResult() {
 		return success;
 	}

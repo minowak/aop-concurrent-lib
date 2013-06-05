@@ -1,5 +1,8 @@
 package com.aop.concurrent.utils;
 
+import com.aop.concurrent.annotations.Consumer;
+import com.aop.concurrent.annotations.Producer;
+
 
 public class ProdConsBuffer {
 
@@ -16,14 +19,17 @@ public class ProdConsBuffer {
 		count = 0;
 	}
 	
-	public synchronized int consume() {
+	@Consumer(buffer="a", size=5)
+	public int consume() {
 		front = (front+1) % SIZE;
-		System.out.println("Consumed: " + buffer[front]);
+//		System.out.println("Consumed: " + buffer[front]);
 		count--;
+		System.out.println("consumed: " + buffer[front]);
 		return buffer[front];
 	}
 	
-	public synchronized void produce(int item) {
+	@Producer(buffer="a", size=5)	
+	public void produce(int item) {
 		rear = (rear+1) % SIZE;
 		buffer[rear] = item;
 		System.out.println("Produced: " + item);
